@@ -4,25 +4,20 @@ from loguru import logger
 from datetime import datetime
 from urllib.parse import urljoin
 import asyncio
-
-#=============SETTINGS==========
-BASE_URL="https://data.cityofnewyork.us/resource/u253-aew4.json"
-OFFSET=0
-LIMIT=4
-TIMEOUT=40
+from settings import settings
 
 
 async def get_trips_records(limit: int, offset: int):
-    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=settings.timeout) as client:
 
         params = {
-            "$limit" : LIMIT,
-            "$offset" : OFFSET,
+            "$limit" : limit,
+            "$offset" : offset,
             "$order" : ":id",
             "$select" : ":*,*"
         }
 
-        response = await client.get(BASE_URL, params=params)
+        response = await client.get(settings.base_url, params=params)
         return response.json()
 
 
