@@ -56,7 +56,15 @@ def bulk_insert_taxi_zones_to_db(taxi_zones: List[Dict]):
         curr_timstamp = datetime.now()
         logger.info(f"Processing records with timestamp: {curr_timstamp}")
         
+        location_ids = set()
+
         for i, tx_zone in enumerate(taxi_zones):
+
+            #deduplicate by loc id
+            if tx_zone.get("locationid") in location_ids:
+                logger.warning(f"Skip duplicate location_id: {tx_zone.get('locationid')}")
+                continue
+
             logger.debug(f"Processing zone {i+1}/{len(taxi_zones)}: {tx_zone.get('zone', 'Unknown')}")
             
             polygon_json = json.dumps(tx_zone.get("the_geom"))
@@ -73,6 +81,7 @@ def bulk_insert_taxi_zones_to_db(taxi_zones: List[Dict]):
                 curr_timstamp
             )
             values_to_insert.append(values)
+            location_ids.add(tx_zone.get("locationid"))
             logger.trace(f"  - Location ID: {tx_zone.get('locationid')}, Borough: {tx_zone.get('borough')}")
         
         logger.info(f"Prepared {len(values_to_insert)} records for insertion")

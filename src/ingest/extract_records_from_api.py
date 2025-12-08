@@ -21,4 +21,6 @@ async def get_trips_records(limit: int, offset: int):
         return response.json()
 
 
+
+
 print(asyncio.run(get_trips_records(limit=4, offset=0)))
