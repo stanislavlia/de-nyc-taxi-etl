@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS taxi_trips (
     pickup_datetime TIMESTAMP NOT NULL,
     dropoff_datetime TIMESTAMP NOT NULL,
     
-    -- Location IDs with foreign keys
-    pulocationid INTEGER REFERENCES taxi_zones(locationid),
-    dolocationid INTEGER REFERENCES taxi_zones(locationid),
+    -- Location IDs (without FK to relax)
+    pulocationid INTEGER,
+    dolocationid INTEGER,
     
     -- Trip metrics
     trip_miles NUMERIC(10, 3),
@@ -74,3 +74,13 @@ CREATE INDEX IF NOT EXISTS idx_taxi_trips_pickup_datetime ON taxi_trips(pickup_d
 CREATE INDEX IF NOT EXISTS idx_taxi_trips_dropoff_datetime ON taxi_trips(dropoff_datetime);
 CREATE INDEX IF NOT EXISTS idx_taxi_trips_pulocationid ON taxi_trips(pulocationid);
 CREATE INDEX IF NOT EXISTS idx_taxi_trips_dolocationid ON taxi_trips(dolocationid);
+
+
+-- Create table for elt jobs
+CREATE TABLE IF NOT EXISTS data_load_info (
+    -- fields to manage load jobs
+    current_offset INTEGER,
+    updated_at TIMESTAMP
+);
+
+INSERT INTO data_load_info VALUES(0, CURRENT_TIMESTAMP);
