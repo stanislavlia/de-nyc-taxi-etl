@@ -12,6 +12,8 @@ class Settings(BaseSettings):
         default="https://data.cityofnewyork.us/resource/u253-aew4.json"
     )
     offset: int = Field(default=0)
+    read_offset_from_db: bool = False
+    autoupdate_offset: bool = False
     limit: int = Field(default=1000)
     timeout: int = Field(default=40)
     app_token: str | None = None
@@ -31,7 +33,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO")
     
     model_config = SettingsConfigDict(
-        env_file="/home/stanislav/Desktop/de-nyc-taxi-etl/.env",
+        env_file="/home/stanislav/Desktop/Data Science projects/de-nyc-taxi-etl/.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="allow"

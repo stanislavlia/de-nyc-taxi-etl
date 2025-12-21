@@ -28,6 +28,23 @@ async def get_trips_records(limit: int, offset: int) -> List[Dict]:
         logger.error(f"Failed get taxi trips: {e}")
 
 
+def read_current_offset():
+    conn = psycopg2.connect(**settings.db_conn_params())
+    cursor = conn.cursor()
+    cursor.execute("SELECT current_offset FROM data_load_info ORDER BY updated_at DESC LIMIT 1")
+    result = cursor.fetchone()
+    offset = result[0]
+    logger.info(f"Read current offset info from db: {result}")
+    return offset
+
+def update_current_offset(new_offset):
+    conn = psycopg2.connect(**settings.db_conn_params())
+    conn.autocommit = True
+    cursor = conn.cursor()
+    cursor.execute("UPDATE data_load_info SET current_offset=%s, updated_at=%s", (new_offset, datetime.now()))
+    conn.commit()
+    logger.info(f"Updated offset in DB to: {new_offset}")
+
 def insert_bulk_trip_records(records: List[Dict]):
     
     try:
@@ -99,7 +116,10 @@ def insert_bulk_trip_records(records: List[Dict]):
 
         inserted = cursor.rowcount
         skipped = len(records) - inserted
+        
         logger.success(f"Taxi trips Bulk Insert Completed | inserted: {inserted} | skipped: {skipped}")
+        if inserted == 0:
+            logger.warning(f"NO ROWS INSERTED!!! | ALL DUPLICATES | CHECK PIPELINE SETTINGS!")
 
     except Exception as e:
         logger.error(f"Failed to bulk insert trips: {e}")
@@ -108,12 +128,23 @@ def insert_bulk_trip_records(records: List[Dict]):
         cursor.close()
         conn.close()
 
-if __name__ == "__main__":
-    OFFSET=500
-    LIMIT=1500
+def run_ingestion():
+    logger.info(f"Starting Loading Taxi Trips from API to Staging DB")
+    
+    offset = 0
+    if settings.read_offset_from_db:
+        offset = read_current_offset()
+    
+    records = asyncio.run(get_trips_records(limit=settings.limit, offset=offset))
+    insert_bulk_trip_records(records)
+
+    if settings.autoupdate_offset:
+        update_current_offset(new_offset=offset + settings.limit)
+    
     
 
-    logger.info(f"Starting Loading Taxi Trips from API to Staging DB")
-    records = asyncio.run(get_trips_records(limit=LIMIT, offset=OFFSET))
-    insert_bulk_trip_records(records)
+if __name__ == "__main__":
+    run_ingestion()
+    
+
     
