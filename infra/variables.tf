@@ -5,6 +5,19 @@ variable "do_token" {
   sensitive   = true
 }
 
+variable "spaces_access_id" {
+  description = "Spaces Access ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "spaces_secret_key" {
+  description = "Spaces secret key"
+  type        = string
+  sensitive   = true
+}
+
+
 variable "pg_version" {
   description = "PostgreSQL version"
   type        = string
@@ -29,6 +42,13 @@ variable "db_dwh" {
   default     = "nyc_taxi_dwh"
 }
 
+variable "db_airflow" {
+  description = "Name of the db for Airflow"
+  type        = string
+  default     = "airflow"
+}
+
+
 variable "db_size" {
   description = "Database cluster size"
   type        = string
@@ -39,4 +59,11 @@ variable "db_region" {
   description = "Database region"
   type        = string
   default     = "sgp1"
+}
+
+variable "bucket_region" {
+  description = "DO Space Bucket region"
+  type = string
+  default = "tor1"
+  
 }

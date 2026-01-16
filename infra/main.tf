@@ -16,3 +16,15 @@ resource "digitalocean_database_db" "processed_db" {
   cluster_id = digitalocean_database_cluster.postgres_cluster.id
   name       = var.db_dwh
 }
+
+resource "digitalocean_database_db" "airflow" {
+  cluster_id = digitalocean_database_cluster.postgres_cluster.id
+  name       = var.db_airflow
+}
+
+#S3-compatible Bucket
+resource "digitalocean_spaces_bucket" "artifacts" {
+  name   = "taxi-project-artifacts"
+  region = var.bucket_region
+}
+
