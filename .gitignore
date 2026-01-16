@@ -2,6 +2,7 @@
 *.parquet
 data/
 .venv
+*.json
 
 #airlfow
 

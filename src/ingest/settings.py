@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO")
     
     model_config = SettingsConfigDict(
-        env_file="/home/stanislav/Desktop/Data Science projects/de-nyc-taxi-etl/.env",
+        env_file="/home/stanislav/Desktop/de-nyc-taxi-etl/.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="allow"
